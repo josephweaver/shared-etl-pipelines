@@ -1,22 +1,21 @@
 ﻿# Shared ETL Pipelines
 
-This repository contains pipeline and script assets used by Research ETL execution environments.
+This repository contains shared pipeline and script assets used by Research ETL execution environments.
 
 ## Layout
 
-- `projects/shared/pipelines/`: shared pipeline YAML files
-- `projects/shared/scripts/`: shared helper scripts referenced by pipelines/plugins
+- `pipelines/`: shared pipeline YAML files
+- `scripts/`: shared helper scripts referenced by pipelines/plugins
 
 ## Initial import
 
 Imported from `research-etl` on 2026-02-19.
 
-## Project routing convention
+## Future project routing
 
-For now, all assets are under `projects/shared/`.
-Future project-specific assets can be added as:
+If/when non-shared projects are added, use top-level folders such as:
 
-- `projects/<project_id>/pipelines/`
-- `projects/<project_id>/scripts/`
+- `pipelines_<project_id>/`
+- `scripts_<project_id>/`
 
-Execution environments can then map `project_id -> projects/<project_id>/...`.
+or separate repos per project.
