@@ -1,9 +1,13 @@
+project_id: land_core
 vars:
-  jobname: sample
   message: "Hello Midwest"
+  name: sample
 dirs:
-  workdir: "data/{jobname}"
+  workdir: "{env.workdir}/{name}/{sys.now.yymmdd}/{sys.now.hhmmss}-{sys.run.short_id}"
+  logdir: "{workdir}/logs"
 steps:
   - name: echo
-    script: 'echo.py message="{message}"'
+    plugin: echo
+    args:
+      message: "{message}"
     when: "True"
