@@ -1,58 +1,56 @@
 project_id: land_core
-
 vars:
-  dataset_id: "raw.tiger_county_download_v1"
+  dataset_id: raw.tiger_county_download_v1
   name: tiger_county
   data_class: RAW
   dataset_title: "U.S. Census TIGER/Line County Boundaries (2025)"
   dataset_notes: "National county boundary polygons from TIGER/Line. Includes county-level administrative boundaries for U.S. analysis workflows."
-  catalog_json: ".runs/catalog/catalog.json"
-  catalog_repo: "../landcore-data-catalog"
-
-dirs:
+  catalog_json: .runs/catalog/catalog.json
+  catalog_repo: ../landcore-data-catalog
   workdir: "{env.workdir}/{name}/{sys.now.yymmdd}/{sys.now.hhmmss}-{sys.run.short_id}"
   logdir: "{workdir}/logs"
   rawdir: "{env.basedir}/data/tiger/county/raw"
   extractdir: "{env.basedir}/data/tiger/county/extract"
-
+  vector_facts_dir: "{workdir}/vector_facts"
+  ai_context_dir: "{workdir}/ai_context"
+  catalog_ai_dir: "{workdir}/catalog_ai"
+dirs:
+  workdir: "{env.workdir}/{name}/{sys.now.yymmdd}/{sys.now.hhmmss}-{sys.run.short_id}"
+  logdir: "{workdir}/logs"
 steps:
-  - name: 01_download_tiger_county
-    plugin: web_download_list.py
+  - name: "{sys.step.NN}_download"
+    plugin: web_download_list
     args:
-      urls_file: "pipelines/tiger/county_urls.txt"
+      urls_file: pipelines/tiger/county_urls.txt
       out: "{rawdir}"
       overwrite: false
       timeout_seconds: 180
     output_var: staged_raw
-
-  - name: 02_extract_tiger_county
-    plugin: archive_extract.py
+  - name: "{sys.step.NN}_extract"
+    plugin: archive_extract
     args:
       archive_glob: "{rawdir}/*.zip"
       out: "{extractdir}"
       overwrite: true
     output_var: extracted_county
-
-  - name: 03_facts_tiger_county
-    plugin: vector_facts.py
+  - name: "{sys.step.NN}_vector_facts"
+    plugin: vector_facts
     args:
       input_dir: "{extractdir}"
-      output_dir: "{workdir}/vector_facts"
+      output_dir: "{vector_facts_dir}"
     output_var: vector_facts
-
-  - name: 04_ai_evidence_tiger_county
-    plugin: ai_dataset_evidence_bundle.py
+  - name: "{sys.step.NN}_ai_evidence"
+    plugin: ai_dataset_evidence_bundle
     args:
       dataset_id: "{dataset_id}"
       input_path: "{extractdir}"
       vector_facts_json: "{vector_facts.vector_facts_json}"
-      output_dir: "{workdir}/ai_context"
-      supplemental_urls_file: "pipelines/tiger/county_urls.txt"
+      output_dir: "{ai_context_dir}"
+      supplemental_urls_file: pipelines/tiger/county_urls.txt
       notes: "{dataset_notes}"
     output_var: evidence
-
-  - name: 05_ai_research_tiger_county
-    plugin: ai_dataset_research.py
+  - name: "{sys.step.NN}_ai_research"
+    plugin: ai_dataset_research
     args:
       dataset_id: "{dataset_id}"
       data_class: "{data_class}"
@@ -62,20 +60,18 @@ steps:
       schema_file: "{evidence.schema_file}"
       notes_file: "{evidence.notes_file}"
       supplemental_urls_file: "{evidence.supplemental_urls_file}"
-      output_dir: "{workdir}/catalog_ai"
+      output_dir: "{catalog_ai_dir}"
     output_var: catalog_ai
-
-  - name: 06_catalog_json_upsert_tiger_county
-    plugin: catalog_json_upsert.py
+  - name: "{sys.step.NN}_catalog_json_upsert"
+    plugin: catalog_json_upsert
     args:
       research_file: "{catalog_ai.output_file}"
       catalog_json: "{catalog_json}"
       project_id: land_core
-      source_step: ai_research_tiger_county
+      source_step: 05_ai_research
     output_var: catalog_json_out
-
-  - name: 07_catalog_yaml_sync_tiger_county
-    plugin: catalog_yaml_sync.py
+  - name: "{sys.step.NN}_catalog_yaml_sync"
+    plugin: catalog_yaml_sync
     args:
       dataset_id: "{dataset_id}"
       catalog_json: "{catalog_json}"
