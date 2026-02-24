@@ -1,0 +1,20 @@
+project_id: land_core
+vars:
+  name: sample_multistep
+  workdir: "{env.workdir}/{name}/{sys.now.yymmdd}/{sys.now.hhmmss}-{sys.run.short_id}"
+  logdir: "{workdir}/logs"
+dirs:
+  workdir: "{env.workdir}/{name}/{sys.now.yymmdd}/{sys.now.hhmmss}-{sys.run.short_id}"
+  logdir: "{workdir}/logs"
+steps:
+  - plugin: echo
+    args:
+      message: "hello 1"
+  - name: "{sys.step.NN}_Step"
+    plugin: echo
+    args:
+      message: "hello 2"
+  - name: "{sys.step.NN}_Step"
+    plugin: echo
+    args:
+      message: "hello 3"
