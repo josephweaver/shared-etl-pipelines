@@ -3,8 +3,5 @@ vars:
   name: sample
   workdir: "{env.workdir}/{sys.now.yymmdd}/{sys.now.hhmmss}-{sys.run.short_id}"
   logdir: "{workdir}/logs"
-dirs:
-  workdir: "{env.workdir}/{sys.now.yymmdd}/{sys.now.hhmmss}-{sys.run.short_id}"
-  logdir: "{workdir}/logs"
 steps:
   - plugin: echo
