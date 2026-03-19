@@ -5,28 +5,31 @@ requires_pipelines:
   - ../tiger/state.yml
 
 vars:
+  dataset_id: stage.prism_ppt_daily_mi_state_tif_v1
   name: prism_stage_ts_ppt_day_state
   state: MI
+  years: "{expr.range(2000, 2018)}"
   prism_measure: ppt
   prism_period: daily
   prism_extract_dir: "{env.basedir}/data/prism/{prism_measure}/{prism_period}/raw"
+  prism_filename_glob: "*.tif"
   state_path: "{env.basedir}/data/tiger/state/extract/tl_2025_us_state.shp"
 
 dirs:
   workdir: "{env.workdir}/{name}/{sys.now.yymmdd}/{sys.now.hhmmss}-{sys.run.short_id}"
   logdir: "{workdir}/logs"
-  outdir: "{env.basedir}/stage/prism/{prism_measure}/{prism_period}/state_tif/{state}"
+  outdir: "{env.basedir}/data/stage/prism/{prism_measure}/{prism_period}/{state}/mask"
 
 steps:
-  - name: "{sys.step.NN}_clip_mi_rasters"
+  - name: "{sys.step.NN}_clip_mi_rasters_for_year"
     plugin: geo/geo_clip_raster_by_polygon.py
     args:
-      raster_path: "{item}"
+      input_dir: "{prism_extract_dir}/{item}"
+      output_dir: "{dirs.outdir}/{item}"
+      filename_glob: "{prism_filename_glob}"
       selector_path: "{state_path}"
-      output_path: "{dirs.outdir}/{item_name}"
       key: STUSPS
       value: "{state}"
       overwrite: false
-    foreach_glob: "{prism_extract_dir}/**/*.tif"
-    foreach_kind: files
+    foreach: years
     output_var: clipped_state_raster

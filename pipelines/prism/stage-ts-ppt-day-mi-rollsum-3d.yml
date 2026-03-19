@@ -15,14 +15,14 @@ vars:
 dirs:
   workdir: "{env.workdir}/{name}/{sys.now.yymmdd}/{sys.now.hhmmss}-{sys.run.short_id}"
   logdir: "{workdir}/logs"
-  state_tif_dir: "{env.basedir}/stage/prism/{prism_measure}/{prism_period}/state_tif/{state}"
-  outdir: "{env.basedir}/stage/prism/{prism_measure}/{prism_period}/state_tif_rollsum_3d/{state}"
+  indir: "{env.basedir}/data/stage/prism/{prism_measure}/{prism_period}/{state}/mask"
+  outdir: "{env.basedir}/data/stage/prism/{prism_measure}/{prism_period}/{state}/rollsum3d"
 
 steps:
   - name: "{sys.step.NN}_year_rollsum_3d"
     plugin: geo/geo_raster_running_window.py
     args:
-      input_glob: "{dirs.state_tif_dir}/{input_filename_glob}"
+      input_glob: "{dirs.indir}/{item}/{input_filename_glob}"
       output_dir: "{dirs.outdir}/{item}"
       metric: sum
       windows: "3"
