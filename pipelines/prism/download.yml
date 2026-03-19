@@ -1,4 +1,4 @@
-project_id: shared
+project_id: default
 vars:
   dataset_id: raw.prism_ppt_monthly_800m_download_v1
   name: prism_download
