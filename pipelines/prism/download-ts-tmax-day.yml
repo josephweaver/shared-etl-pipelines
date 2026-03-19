@@ -1,14 +1,16 @@
 project_id: default
 vars:
-  dataset_id: raw.prism_ppt_monthly_800m_download_v1
-  name: prism_download
-  prism_base_url: ftp://prism.oregonstate.edu/time_series/us/an/800m/ppt/monthly
+  dataset_id: raw.prism_daily_800m_download_v1
+  name: prism
   years: "{expr.range(2000, 2018)}"
+  prism_type: time_series
+  prism_period: daily
+  prism_measure: 'tmax'
+  prism_base_url: ftp://prism.oregonstate.edu/{prism_type}/us/an/800m/{prism_measure}/{prism_period}
   prism_filename_glob: "*"
-dirs:
   workdir: "{env.workdir}/{name}/{sys.now.yymmdd}/{sys.now.hhmmss}-{sys.run.short_id}"
   logdir: "{workdir}/logs"
-  rawdir: "{env.basedir}/data/prism/ppt/daily"
+  rawdir: "{env.basedir}/data/prism/{prism_measure}/{prism_period}"
   archivedir: "{rawdir}/archive"
   extractdir: "{rawdir}/raw"
 steps:
