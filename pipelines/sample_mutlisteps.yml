@@ -1,4 +1,4 @@
-project_id: land_core
+project_id: default
 vars:
   name: sample_multistep
   workdir: "{env.workdir}/{name}/{sys.now.yymmdd}/{sys.now.hhmmss}-{sys.run.short_id}"

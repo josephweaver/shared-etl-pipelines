@@ -1,4 +1,4 @@
-project_id: land_core
+project_id: default
 vars:
   basedir: "{env.basedir}/land_core"
   owner: land-core

@@ -1,4 +1,4 @@
-project_id: land_core
+project_id: default
 
 vars:
   name: prism_county_daily_aggregate_parent

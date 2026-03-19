@@ -1,4 +1,4 @@
-project_id: land_core
+project_id: default
 vars:
   dataset_id: raw.tiger_county_download_v1
   name: tiger_county
