@@ -1,8 +1,8 @@
 project_id: default
 
 requires_pipelines:
-  - pipelines/prism/download-ts-ppt-day.yml
-  - pipelines/tiger/state.yml
+  - download-ts-ppt-day.yml
+  - ../tiger/state.yml
 
 vars:
   name: prism_stage_ts_ppt_day_state
