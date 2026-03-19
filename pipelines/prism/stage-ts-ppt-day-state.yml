@@ -1,4 +1,4 @@
-project_id: land_core
+project_id: default
 
 requires_pipelines:
   - pipelines/prism/download-ts-ppt-day.yml
