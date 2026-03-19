@@ -1,0 +1,36 @@
+project_id: default
+
+requires_pipelines:
+  - stage-ts-ppt-day-state.yml
+
+vars:
+  dataset_id: stage.prism_ppt_daily_mi_rollsum_{window}d_v1
+  name: prism_stage_ts_ppt_day_mi_rollsum_{window}d
+  window: 7
+  state: MI
+  years: "{expr.range(2000, 2018)}"
+  prism_measure: ppt
+  prism_period: daily
+  input_filename_glob: "PRISM_ppt_stable_4kmD2_*.tif"
+
+dirs:
+  workdir: "{env.workdir}/{name}/{sys.now.yymmdd}/{sys.now.hhmmss}-{sys.run.short_id}"
+  logdir: "{workdir}/logs"
+  indir: "{env.basedir}/data/stage/prism/{prism_measure}/{prism_period}/{state}/mask"
+  outdir: "{env.basedir}/data/stage/prism/{prism_measure}/{prism_period}/{state}/rollsum{window}d"
+
+steps:
+  - name: "{sys.step.NN}_year_rollsum_{window}d"
+    plugin: geo/geo_raster_running_window.py
+    args:
+      input_glob: "{dirs.indir}/{item}/{input_filename_glob}"
+      output_dir: "{dirs.outdir}/{item}"
+      metric: sum
+      windows: "window"
+      input_start_day: "{expr.dateformat(expr.datediff(expr.date(item, 1, 1), -2, 'D'), '%Y%m%d')}"
+      input_end_day: "{expr.dateformat(expr.date(item, 12, 31), '%Y%m%d')}"
+      output_start_day: "{expr.dateformat(expr.date(item, 1, 1), '%Y%m%d')}"
+      output_end_day: "{expr.dateformat(expr.date(item, 12, 31), '%Y%m%d')}"
+      overwrite: false
+    foreach: years
+    output_var: rolling_window_year
