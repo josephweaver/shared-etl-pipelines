@@ -4,8 +4,9 @@ requires_pipelines:
   - stage-ts-ppt-day-state.yml
 
 vars:
-  dataset_id: stage.prism_ppt_daily_mi_rollsum_3d_v1
-  name: prism_stage_ts_ppt_day_mi_rollsum_3d
+  window: 3
+  dataset_id: stage.prism_ppt_daily_mi_rollsum_{window}d_v1
+  name: prism_stage_ts_ppt_day_mi_rollsum_{window}d
   state: MI
   years: "{expr.range(2000, 2018)}"
   prism_measure: ppt
@@ -16,20 +17,17 @@ dirs:
   workdir: "{env.workdir}/{name}/{sys.now.yymmdd}/{sys.now.hhmmss}-{sys.run.short_id}"
   logdir: "{workdir}/logs"
   indir: "{env.basedir}/data/stage/prism/{prism_measure}/{prism_period}/{state}/mask"
-  outdir: "{env.basedir}/data/stage/prism/{prism_measure}/{prism_period}/{state}/rollsum3d"
+  outdir: "{env.basedir}/data/stage/prism/{prism_measure}/{prism_period}/{state}/rollsum{window}"
 
 steps:
-  - name: "{sys.step.NN}_year_rollsum_3d"
+  - name: "{sys.step.NN}_year_rollsum_{window}d"
     plugin: geo/geo_raster_running_window.py
     args:
-      input_glob: "{dirs.indir}/{item}/{input_filename_glob}"
+      input_glob: "{dirs.indir}/*/{input_filename_glob}"
       output_dir: "{dirs.outdir}/{item}"
       metric: sum
-      windows: "3"
-      input_start_day: "{expr.dateformat(expr.datediff(expr.date(item, 1, 1), -2, 'D'), '%Y%m%d')}"
-      input_end_day: "{expr.dateformat(expr.date(item, 12, 31), '%Y%m%d')}"
-      output_start_day: "{expr.dateformat(expr.date(item, 1, 1), '%Y%m%d')}"
-      output_end_day: "{expr.dateformat(expr.date(item, 12, 31), '%Y%m%d')}"
+      windows: "{window}"
+      target_year: "{item}"
       overwrite: false
     foreach: years
     output_var: rolling_window_year
