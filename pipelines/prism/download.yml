@@ -1,9 +1,9 @@
-project_id: land_core
+project_id: shared
 vars:
   dataset_id: raw.prism_ppt_monthly_800m_download_v1
   name: prism_download
   prism_base_url: ftp://prism.oregonstate.edu/time_series/us/an/800m/ppt/monthly
-  years: "{expr.range(2018, 2019)}"
+  years: "{expr.range(2000, 2018)}"
   prism_filename_glob: "*"
 dirs:
   workdir: "{env.workdir}/{name}/{sys.now.yymmdd}/{sys.now.hhmmss}-{sys.run.short_id}"
