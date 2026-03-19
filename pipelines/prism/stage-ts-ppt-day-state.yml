@@ -7,20 +7,26 @@ requires_pipelines:
 vars:
   name: prism_stage_ts_ppt_day_state
   state: MI
-  years: "{expr.range(2000, 2018)}"
+  prism_measure: ppt
+  prism_period: daily
+  prism_extract_dir: "{env.basedir}/data/prism/{prism_measure}/{prism_period}/raw"
+  state_path: "{env.basedir}/data/tiger/state/extract/tl_2025_us_state.shp"
 
 dirs:
   workdir: "{env.workdir}/{name}/{sys.now.yymmdd}/{sys.now.hhmmss}-{sys.run.short_id}"
   logdir: "{workdir}/logs"
+  outdir: "{env.basedir}/stage/prism/{prism_measure}/{prism_period}/state_tif/{state}"
 
 steps:
-  - name: "{sys.step.NN}_run_mi_year_child"
-    plugin: pipeline_execute.py
+  - name: "{sys.step.NN}_clip_mi_rasters"
+    plugin: geo/geo_clip_raster_by_polygon.py
     args:
-      pipeline_path: "pipelines/prism/stage-ts-ppt-day-state-child.yml"
-      mode: synchronized
-      env: hpcc_msu_local
-      vars_kv: "year={item};state={state}"
-    foreach: years
-    parallel_with: year_children
-    output_var: state_year_child
+      raster_path: "{item}"
+      selector_path: "{state_path}"
+      output_path: "{dirs.outdir}/{item_name}"
+      key: STUSPS
+      value: "{state}"
+      overwrite: false
+    foreach_glob: "{prism_extract_dir}/**/*.tif"
+    foreach_kind: files
+    output_var: clipped_state_raster
