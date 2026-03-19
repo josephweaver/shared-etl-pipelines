@@ -10,8 +10,7 @@ ftp://prism.oregonstate.edu/time_series/us/an/800m/ppt/monthly
 
 
 ```{commandline}
-python cli.py run prism/download.yml `
-  --env hpcc_msu
+python cli.py run prism/download.yml --env hpcc_msu --project-id default
 ```
 
 
