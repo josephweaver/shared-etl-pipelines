@@ -1,0 +1,59 @@
+project_id: default
+vars:
+  dataset_id: raw.sentinel2_l2a_michigan_download_v1
+  name: sentinel2_l2a_michigan
+  data_class: RAW
+  dataset_title: "Sentinel-2 L2A Michigan Download"
+  stac_api_url: https://planetarycomputer.microsoft.com/api/stac/v1/search
+  stac_collection: sentinel-2-l2a
+  stac_sign_api_url: https://planetarycomputer.microsoft.com/api/sas/v1/token/sentinel-2-l2a
+  michigan_bbox: [-90.42, 41.69, -82.12, 48.31]
+  datetime_range: "{sys.now.yyyy}-01-01/{sys.now.yyyy}-12-31"
+  max_cloud_cover: 20
+  page_size: 100
+  max_items: 0
+  asset_keys:
+    - AOT
+    - B01
+    - B02
+    - B03
+    - B04
+    - B05
+    - B06
+    - B07
+    - B08
+    - B09
+    - B11
+    - B12
+    - B8A
+    - SCL
+    - WVP
+    - visual
+    - thumbnail
+    - metadata
+    - product_metadata
+    - tileinfo_metadata
+  workdir: "{env.workdir}/{name}/{sys.now.yymmdd}/{sys.now.hhmmss}-{sys.run.short_id}"
+  logdir: "{workdir}/logs"
+  rawdir: "{env.basedir}/data/sentinel2/l2a/michigan/raw"
+dirs:
+  workdir: "{workdir}"
+  logdir: "{logdir}"
+steps:
+  - name: "{sys.step.NN}_download_sentinel2_l2a_michigan"
+    plugin: stac_asset_download
+    args:
+      api_url: "{stac_api_url}"
+      collection: "{stac_collection}"
+      datetime: "{datetime_range}"
+      bbox: "{michigan_bbox}"
+      query_json: '{"eo:cloud_cover":{"lt":{max_cloud_cover}}}'
+      asset_keys: "{asset_keys}"
+      page_size: "{page_size}"
+      max_items: "{max_items}"
+      sign_api_url: "{stac_sign_api_url}"
+      out: "{rawdir}"
+      overwrite: false
+      timeout_seconds: 1800
+      save_item_json: true
+    output_var: staged_raw
