@@ -21,7 +21,7 @@ steps:
   - name: "{sys.step.NN}_calc_spi_3d"
     plugin: geo/geo_raster_spi.py
     args:
-      input_glob: "{dirs.indir}/*/sum_03d/{input_filename_glob}"
+      input_glob: "{dirs.indir}/*/{input_filename_glob}"
       output_dir: "{dirs.outdir}"
       method: zscore
       overwrite: false
