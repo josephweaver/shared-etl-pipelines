@@ -1,0 +1,81 @@
+project_id: default
+vars:
+  dataset_id: raw.usda_nass_quick_stats_bulk_download_v1
+  name: usda_nass_quick_stats_bulk
+  data_class: RAW
+  dataset_title: "USDA NASS Quick Stats Crops, Census Bulk Files, and Crop Progress Archives"
+  quickstats_release_date: "{sys.now.yyyymmdd}"
+  quickstats_base_url: https://www.nass.usda.gov/datasets
+  crop_progress_base_url: https://www.nass.usda.gov/Research_and_Science/Crop_Progress_Gridded_Layers/datasets
+  census_files:
+    - qs.census2002.txt.gz
+    - qs.census2007.txt.gz
+    - qs.census2007zipcode.txt.gz
+    - qs.census2012.txt.gz
+    - qs.census2017.txt.gz
+    - qs.census2017zipcode.txt.gz
+    - qs.census2022.txt.gz
+  crop_progress_years: "{expr.range(2015, 2026)}"
+  workdir: "{env.workdir}/{name}/{sys.now.yymmdd}/{sys.now.hhmmss}-{sys.run.short_id}"
+  logdir: "{workdir}/logs"
+  rawdir: "{env.basedir}/data/usda_nass"
+  quickstats_raw_dir: "{rawdir}/quick_stats/raw"
+  quickstats_extract_dir: "{rawdir}/quick_stats/extract"
+  crop_progress_raw_dir: "{rawdir}/crop_progress/raw"
+  crop_progress_extract_dir: "{rawdir}/crop_progress/extract"
+dirs:
+  workdir: "{workdir}"
+  logdir: "{logdir}"
+steps:
+  - name: "{sys.step.NN}_download_qs_crops"
+    plugin: web_download_list
+    args:
+      urls: "{quickstats_base_url}/qs.crops_{quickstats_release_date}.txt.gz"
+      out: "{quickstats_raw_dir}"
+      overwrite: false
+      conditional_get: true
+      timeout_seconds: 7200
+    output_var: staged_qs_crops
+  - name: "{sys.step.NN}_extract_qs_crops"
+    plugin: gzip_extract
+    args:
+      archive: "{quickstats_raw_dir}/qs.crops_{quickstats_release_date}.txt.gz"
+      out: "{quickstats_extract_dir}"
+      overwrite: true
+    output_var: extracted_qs_crops
+  - name: "{sys.step.NN}_download_qs_census"
+    plugin: web_download_list
+    args:
+      urls: "{quickstats_base_url}/{item}"
+      out: "{quickstats_raw_dir}"
+      overwrite: false
+      conditional_get: true
+      timeout_seconds: 3600
+    foreach: census_files
+    output_var: staged_qs_census
+  - name: "{sys.step.NN}_extract_qs_census"
+    plugin: gzip_extract
+    args:
+      archive: "{quickstats_raw_dir}/{item}"
+      out: "{quickstats_extract_dir}"
+      overwrite: true
+    foreach: census_files
+    output_var: extracted_qs_census
+  - name: "{sys.step.NN}_download_crop_progress"
+    plugin: web_download_list
+    args:
+      urls: "{crop_progress_base_url}/cpc{item}.zip"
+      out: "{crop_progress_raw_dir}"
+      overwrite: false
+      conditional_get: true
+      timeout_seconds: 3600
+    foreach: crop_progress_years
+    output_var: staged_crop_progress
+  - name: "{sys.step.NN}_extract_crop_progress"
+    plugin: archive_extract
+    args:
+      archive: "{crop_progress_raw_dir}/cpc{item}.zip"
+      out: "{crop_progress_extract_dir}/{item}"
+      overwrite: true
+    foreach: crop_progress_years
+    output_var: extracted_crop_progress

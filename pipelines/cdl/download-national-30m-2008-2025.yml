@@ -1,0 +1,34 @@
+project_id: default
+vars:
+  dataset_id: raw.usda_nass_cdl_national_30m_download_v1
+  name: usda_nass_cdl_national_30m
+  data_class: RAW
+  dataset_title: "USDA NASS Cropland Data Layer National 30 m Annual Archives (2008-2025)"
+  years: "{expr.range(2008, 2026)}"
+  cdl_base_url: https://www.nass.usda.gov/Research_and_Science/Cropland/Release/datasets
+  workdir: "{env.workdir}/{name}/{sys.now.yymmdd}/{sys.now.hhmmss}-{sys.run.short_id}"
+  logdir: "{workdir}/logs"
+  rawdir: "{env.basedir}/data/cdl/national_30m/raw"
+  extractdir: "{env.basedir}/data/cdl/national_30m/extract"
+dirs:
+  workdir: "{env.workdir}/{name}/{sys.now.yymmdd}/{sys.now.hhmmss}-{sys.run.short_id}"
+  logdir: "{workdir}/logs"
+steps:
+  - name: "{sys.step.NN}_download_cdl_archives"
+    plugin: web_download_list
+    args:
+      urls: "{cdl_base_url}/{item}_30m_cdls.zip"
+      out: "{rawdir}"
+      overwrite: false
+      conditional_get: true
+      timeout_seconds: 1800
+    foreach: years
+    output_var: staged_raw
+  - name: "{sys.step.NN}_extract_cdl_archives"
+    plugin: archive_extract
+    args:
+      archive: "{rawdir}/{item}_30m_cdls.zip"
+      out: "{extractdir}/{item}"
+      overwrite: true
+    foreach: years
+    output_var: extracted_raw
