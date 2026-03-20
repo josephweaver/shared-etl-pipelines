@@ -1,0 +1,28 @@
+project_id: default
+
+requires_pipelines:
+  - stage-ts-ppt-day-mi-rollsum-3d.yml
+
+vars:
+  dataset_id: stage.prism_ppt_daily_mi_spi_3d_zscore_v1
+  name: prism_stage_ts_ppt_day_mi_spi_3d
+  state: MI
+  prism_measure: ppt
+  prism_period: daily
+  input_filename_glob: "PRISM_ppt_stable_4kmD2_*.tif"
+
+dirs:
+  workdir: "{env.workdir}/{name}/{sys.now.yymmdd}/{sys.now.hhmmss}-{sys.run.short_id}"
+  logdir: "{workdir}/logs"
+  indir: "{env.basedir}/data/stage/prism/{prism_measure}/{prism_period}/{state}/rollsum3d"
+  outdir: "{env.basedir}/data/stage/prism/{prism_measure}/{prism_period}/{state}/spi3d"
+
+steps:
+  - name: "{sys.step.NN}_calc_spi_3d"
+    plugin: geo/geo_raster_spi.py
+    args:
+      input_glob: "{dirs.indir}/*/sum_03d/{input_filename_glob}"
+      output_dir: "{dirs.outdir}"
+      method: zscore
+      overwrite: false
+    output_var: spi_3d

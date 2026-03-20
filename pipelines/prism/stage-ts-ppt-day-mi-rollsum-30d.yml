@@ -4,7 +4,7 @@ requires_pipelines:
   - stage-ts-ppt-day-state.yml
 
 vars:
-  window: 3
+  window: 30
   dataset_id: stage.prism_ppt_daily_mi_rollsum_{window}d_v1
   name: prism_stage_ts_ppt_day_mi_rollsum_{window}d
   state: MI
