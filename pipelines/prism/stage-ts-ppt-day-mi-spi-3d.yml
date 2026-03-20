@@ -9,7 +9,7 @@ vars:
   state: MI
   prism_measure: ppt
   prism_period: daily
-  input_filename_glob: "PRISM_ppt_stable_4kmD2_*.tif"
+  input_filename_glob: "prism_ppt_us_30s_*.tif"
 
 dirs:
   workdir: "{env.workdir}/{name}/{sys.now.yymmdd}/{sys.now.hhmmss}-{sys.run.short_id}"
