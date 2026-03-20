@@ -14,7 +14,7 @@ vars:
 dirs:
   workdir: "{env.workdir}/{name}/{sys.now.yymmdd}/{sys.now.hhmmss}-{sys.run.short_id}"
   logdir: "{workdir}/logs"
-  indir: "{env.basedir}/data/stage/prism/{prism_measure}/{prism_period}/{state}/rollsum3d"
+  indir: "{env.basedir}/data/stage/prism/{prism_measure}/{prism_period}/{state}/rollsum3"
   outdir: "{env.basedir}/data/stage/prism/{prism_measure}/{prism_period}/{state}/spi3d"
 
 steps:
