@@ -1,14 +1,14 @@
 project_id: default
 
 requires_pipelines:
-  - download-national-30m-2008-2025.yml
+  - ../cdl/download-national-30m-2008-2025.yml
   - ../tiger/state.yml
   - ../tiger/county.yml
   - ../prism/stage-ts-ppt-day-state.yml
 
 vars:
-  dataset_id: stage.mi_corn_soy_prism_ppt_county_v1
-  name: mi_corn_soy_prism_ppt_county
+  dataset_id: stage.mi_corn_prism_ppt_county_v1
+  name: mi_corn_prism_ppt_county
   state: MI
   statefp: "26"
   years: "{expr.range(2008, 2018)}"
@@ -47,15 +47,6 @@ steps:
       overwrite: false
     foreach: years
     output_var: corn_mask30
-  - name: "{sys.step.NN}_mask_mi_soy_30m"
-    plugin: geo/geo_raster_value_mask.py
-    args:
-      input_raster: "{dirs.cdl_mi_dir}/{item}/mi_{item}_cdl.tif"
-      output_path: "{dirs.mask30_dir}/{item}/soy_30m.tif"
-      include_values: "5"
-      overwrite: false
-    foreach: years
-    output_var: soy_mask30
   - name: "{sys.step.NN}_resample_corn_fraction_to_prism"
     plugin: geo/geo_raster_reproject.py
     args:
@@ -67,17 +58,6 @@ steps:
       overwrite: false
     foreach: years
     output_var: corn_fraction
-  - name: "{sys.step.NN}_resample_soy_fraction_to_prism"
-    plugin: geo/geo_raster_reproject.py
-    args:
-      input_path: "{dirs.mask30_dir}/{item}/soy_30m.tif"
-      output_path: "{dirs.fraction_dir}/{item}/soy_fraction.tif"
-      template_glob: "{prism_mi_dir}/{item}/*.tif"
-      resampling: average
-      dst_nodata: 255
-      overwrite: false
-    foreach: years
-    output_var: soy_fraction
   - name: "{sys.step.NN}_weight_mi_prism_ppt_for_corn"
     plugin: geo/geo_raster_multiply.py
     args:
@@ -88,16 +68,6 @@ steps:
       overwrite: false
     foreach: years
     output_var: corn_weighted
-  - name: "{sys.step.NN}_weight_mi_prism_ppt_for_soy"
-    plugin: geo/geo_raster_multiply.py
-    args:
-      input_dir: "{prism_mi_dir}/{item}"
-      filename_glob: "*.tif"
-      weight_raster: "{dirs.fraction_dir}/{item}/soy_fraction.tif"
-      output_dir: "{dirs.weighted_dir}/soy/{item}"
-      overwrite: false
-    foreach: years
-    output_var: soy_weighted
   - name: "{sys.step.NN}_aggregate_corn_by_county"
     plugin: geo/geo_county_weighted_raster_aggregate.py
     args:
@@ -113,18 +83,3 @@ steps:
       overwrite: true
     foreach: years
     output_var: corn_county
-  - name: "{sys.step.NN}_aggregate_soy_by_county"
-    plugin: geo/geo_county_weighted_raster_aggregate.py
-    args:
-      input_dir: "{dirs.weighted_dir}/soy/{item}"
-      filename_glob: "*.tif"
-      weight_raster: "{dirs.fraction_dir}/{item}/soy_fraction.tif"
-      county_path: "{county_path}"
-      output_path: "{dirs.county_dir}/soy/county_soy_ppt_{item}.csv"
-      county_id_field: GEOID
-      county_name_field: NAME
-      value_prefix: soy_ppt
-      day_from_filename_regex: "(\\d{8})"
-      overwrite: true
-    foreach: years
-    output_var: soy_county
