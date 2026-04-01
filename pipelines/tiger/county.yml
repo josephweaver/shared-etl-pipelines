@@ -9,8 +9,8 @@ vars:
   catalog_repo: ../landcore-data-catalog
   workdir: "{env.workdir}/{name}/{sys.now.yymmdd}/{sys.now.hhmmss}-{sys.run.short_id}"
   logdir: "{workdir}/logs"
-  rawdir: "{env.basedir}/data/tiger/county/raw"
-  extractdir: "{env.basedir}/data/tiger/county/extract"
+  rawdir: "{env.basedir}/etl/data/tiger/county/raw"
+  extractdir: "{env.basedir}/etl/data/tiger/county/extract"
   vector_facts_dir: "{workdir}/vector_facts"
   ai_context_dir: "{workdir}/ai_context"
   catalog_ai_dir: "{workdir}/catalog_ai"
