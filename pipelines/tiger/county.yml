@@ -33,48 +33,48 @@ steps:
       out: "{extractdir}"
       overwrite: true
     output_var: extracted_county
-  - name: "{sys.step.NN}_vector_facts"
-    plugin: vector_facts
-    args:
-      input_dir: "{extractdir}"
-      output_dir: "{vector_facts_dir}"
-    output_var: vector_facts
-  - name: "{sys.step.NN}_ai_evidence"
-    plugin: ai_dataset_evidence_bundle
-    args:
-      dataset_id: "{dataset_id}"
-      input_path: "{extractdir}"
-      vector_facts_json: "{vector_facts.vector_facts_json}"
-      output_dir: "{ai_context_dir}"
-      supplemental_urls_file: pipelines/tiger/county_urls.txt
-      notes: "{dataset_notes}"
-    output_var: evidence
-  - name: "{sys.step.NN}_ai_research"
-    plugin: ai_dataset_research
-    args:
-      dataset_id: "{dataset_id}"
-      data_class: "{data_class}"
-      title: "{dataset_title}"
-      artifact_uri: "{extractdir}"
-      sample_file: "{evidence.sample_file}"
-      schema_file: "{evidence.schema_file}"
-      notes_file: "{evidence.notes_file}"
-      supplemental_urls_file: "{evidence.supplemental_urls_file}"
-      output_dir: "{catalog_ai_dir}"
-    output_var: catalog_ai
-  - name: "{sys.step.NN}_catalog_json_upsert"
-    plugin: catalog_json_upsert
-    args:
-      research_file: "{catalog_ai.output_file}"
-      catalog_json: "{catalog_json}"
-      project_id: land_core
-      source_step: 05_ai_research
-    output_var: catalog_json_out
-  - name: "{sys.step.NN}_catalog_yaml_sync"
-    plugin: catalog_yaml_sync
-    args:
-      dataset_id: "{dataset_id}"
-      catalog_json: "{catalog_json}"
-      catalog_repo: "{catalog_repo}"
-      overwrite_managed_fields: false
-    output_var: catalog_yaml
+  # - name: "{sys.step.NN}_vector_facts"
+  #   plugin: vector_facts
+  #   args:
+  #     input_dir: "{extractdir}"
+  #     output_dir: "{vector_facts_dir}"
+  #   output_var: vector_facts
+  # - name: "{sys.step.NN}_ai_evidence"
+  #   plugin: ai_dataset_evidence_bundle
+  #   args:
+  #     dataset_id: "{dataset_id}"
+  #     input_path: "{extractdir}"
+  #     vector_facts_json: "{vector_facts.vector_facts_json}"
+  #     output_dir: "{ai_context_dir}"
+  #     supplemental_urls_file: pipelines/tiger/county_urls.txt
+  #     notes: "{dataset_notes}"
+  #   output_var: evidence
+  # - name: "{sys.step.NN}_ai_research"
+  #   plugin: ai_dataset_research
+  #   args:
+  #     dataset_id: "{dataset_id}"
+  #     data_class: "{data_class}"
+  #     title: "{dataset_title}"
+  #     artifact_uri: "{extractdir}"
+  #     sample_file: "{evidence.sample_file}"
+  #     schema_file: "{evidence.schema_file}"
+  #     notes_file: "{evidence.notes_file}"
+  #     supplemental_urls_file: "{evidence.supplemental_urls_file}"
+  #     output_dir: "{catalog_ai_dir}"
+  #   output_var: catalog_ai
+  # - name: "{sys.step.NN}_catalog_json_upsert"
+  #   plugin: catalog_json_upsert
+  #   args:
+  #     research_file: "{catalog_ai.output_file}"
+  #     catalog_json: "{catalog_json}"
+  #     project_id: land_core
+  #     source_step: 05_ai_research
+  #   output_var: catalog_json_out
+  # - name: "{sys.step.NN}_catalog_yaml_sync"
+  #   plugin: catalog_yaml_sync
+  #   args:
+  #     dataset_id: "{dataset_id}"
+  #     catalog_json: "{catalog_json}"
+  #     catalog_repo: "{catalog_repo}"
+  #     overwrite_managed_fields: false
+  #   output_var: catalog_yaml
