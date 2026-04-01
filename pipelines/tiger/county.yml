@@ -5,12 +5,13 @@ vars:
   data_class: RAW
   dataset_title: "U.S. Census TIGER/Line County Boundaries (2025)"
   dataset_notes: "National county boundary polygons from TIGER/Line. Includes county-level administrative boundaries for U.S. analysis workflows."
+  tiger_county_url: "https://www2.census.gov/geo/tiger/TIGER2025/COUNTY/tl_2025_us_county.zip"
   catalog_json: .runs/catalog/catalog.json
   catalog_repo: ../landcore-data-catalog
   workdir: "{env.workdir}/{name}/{sys.now.yymmdd}/{sys.now.hhmmss}-{sys.run.short_id}"
   logdir: "{workdir}/logs"
-  rawdir: "{env.basedir}/etl/data/tiger/county/raw"
-  extractdir: "{env.basedir}/etl/data/tiger/county/extract"
+  rawdir: "{env.basedir}/data/tiger/county/raw"
+  extractdir: "{env.basedir}/data/tiger/county/extract"
   vector_facts_dir: "{workdir}/vector_facts"
   ai_context_dir: "{workdir}/ai_context"
   catalog_ai_dir: "{workdir}/catalog_ai"
@@ -21,7 +22,7 @@ steps:
   - name: "{sys.step.NN}_download"
     plugin: web_download_list
     args:
-      urls_file: pipelines/tiger/county_urls.txt
+      urls: "{tiger_county_url}"
       out: "{rawdir}"
       overwrite: false
       timeout_seconds: 180
@@ -46,7 +47,7 @@ steps:
   #     input_path: "{extractdir}"
   #     vector_facts_json: "{vector_facts.vector_facts_json}"
   #     output_dir: "{ai_context_dir}"
-  #     supplemental_urls_file: pipelines/tiger/county_urls.txt
+  #     supplemental_urls_file: ""
   #     notes: "{dataset_notes}"
   #   output_var: evidence
   # - name: "{sys.step.NN}_ai_research"
