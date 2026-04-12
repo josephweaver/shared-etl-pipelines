@@ -1,0 +1,18 @@
+project_id: default
+requires_pipelines:
+  - pipelines/tiger/county.yml
+  - pipelines/tiger/state.yml
+vars:
+  name: tiger_counties_csv
+  county_path: "{env.basedir}/data/tiger/county/extract/tl_2025_us_county.shp"
+  state_path: "{env.basedir}/data/tiger/state/extract/tl_2025_us_state.shp"
+  output_csv: "{env.basedir}/data/tiger/counties.csv"
+  workdir: "{env.workdir}/{name}/{sys.now.yymmdd}/{sys.now.hhmmss}-{sys.run.short_id}"
+  logdir: "{workdir}/logs"
+steps:
+  - name: "{sys.step.NN}_export_counties_csv"
+    plugin: exec_script.py
+    args:
+      script: scripts/tiger/export_counties_csv.py
+      script_args: "--county-path \"{county_path}\" --state-path \"{state_path}\" --output-csv \"{output_csv}\" --verbose"
+    output_var: counties_csv
